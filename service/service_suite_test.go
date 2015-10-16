@@ -5,14 +5,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cloudfoundry-incubator/cf-test-helpers/services/context_setup"
+	"github.com/cloudfoundry-incubator/cf-test-helpers/services"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 type rabbitmqTestConfig struct {
-	context_setup.IntegrationConfig
+	services.Config
 
 	ServiceName string   `json:"service_name"`
 	PlanNames   []string `json:"plan_names"`
@@ -37,8 +37,8 @@ func loadConfig() (testConfig rabbitmqTestConfig) {
 var config = loadConfig()
 
 func TestService(t *testing.T) {
-	context_setup.TimeoutScale = 3
-	context_setup.SetupEnvironment(context_setup.NewContext(config.IntegrationConfig, "rabbitmq-smoke-tests"))
+	services.NewContext(config.Config, "rabbitmq-smoke-tests").Setup()
+	config.TimeoutScale = 3
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "RabbitMQ Smoke Tests")
 }
