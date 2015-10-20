@@ -1,6 +1,8 @@
 package service_test
 
 import (
+	"encoding/json"
+	"os"
 	"fmt"
 	"time"
 
@@ -8,12 +10,38 @@ import (
 
 	"github.com/cloudfoundry-incubator/cf-test-helpers/cf"
 	"github.com/cloudfoundry-incubator/cf-test-helpers/runner"
+	"github.com/cloudfoundry-incubator/cf-test-helpers/services"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 )
+
+type rabbitmqTestConfig struct {
+	services.Config
+
+	ServiceName string   `json:"service_name"`
+	PlanNames   []string `json:"plan_names"`
+}
+
+func loadConfig() (testConfig rabbitmqTestConfig) {
+	path := os.Getenv("CONFIG_PATH")
+	configFile, err := os.Open(path)
+	if err != nil {
+		panic(err)
+	}
+
+	decoder := json.NewDecoder(configFile)
+	err = decoder.Decode(&testConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	return testConfig
+}
+
+var config = loadConfig()
 
 var _ = Describe("RabbitMQ Service", func() {
 	var timeout = time.Second * 60
@@ -36,6 +64,11 @@ var _ = Describe("RabbitMQ Service", func() {
 		Eventually(runner.Curl(pingUri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("OK"))
 		fmt.Println("\n")
 	}
+
+	BeforeSuite(func() {
+		config.TimeoutScale = 3
+		services.NewContext(config.Config, "rabbitmq-smoke-test").Setup()
+	})
 
 	BeforeEach(func() {
 		appName = randomName()
