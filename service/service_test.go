@@ -97,7 +97,7 @@ var _ = Describe("RabbitMQ Service", func() {
 			 */
 			uri := appUri(appName) + "/queues"
 			fmt.Println("Creating a new queue: ", uri)
-			Eventually(runner.Curl(uri, "-k", "-X", "POST", "-d", "{name:test-q}"), config.ScaledTimeout(timeout), retryInterval).Should(Say("SUCCESS"))
+			Eventually(runner.Curl(uri, "-k", "-X", "POST", "-d", "name=test-q"), config.ScaledTimeout(timeout), retryInterval).Should(Say("SUCCESS"))
 			fmt.Println("\n")
 
 			fmt.Println("Listing the queues: ", uri)
