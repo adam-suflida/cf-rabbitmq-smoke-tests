@@ -2,11 +2,11 @@ package service_test
 
 import (
 	"encoding/json"
-	"os"
 	"fmt"
+	"os"
 	"time"
 
-	"code.google.com/p/go-uuid/uuid"
+	"github.com/pborman/uuid"
 
 	"github.com/cloudfoundry-incubator/cf-test-helpers/cf"
 	"github.com/cloudfoundry-incubator/cf-test-helpers/runner"
@@ -21,8 +21,9 @@ import (
 type rabbitmqTestConfig struct {
 	services.Config
 
-	ServiceName string   `json:"service_name"`
-	PlanNames   []string `json:"plan_names"`
+	ServiceName     string   `json:"service_name"`
+	PlanNames       []string `json:"plan_names"`
+	RabbitMQSkipSSL bool     `json:"rabbitmq_skip_ssl"`
 }
 
 func loadConfig() (testConfig rabbitmqTestConfig) {
@@ -85,16 +86,21 @@ var _ = Describe("RabbitMQ Service", func() {
 
 			Eventually(cf.Cf("create-service", config.ServiceName, planName, serviceInstanceName), config.ScaledTimeout(timeout)).Should(Exit(0))
 			Eventually(cf.Cf("bind-service", appName, serviceInstanceName), config.ScaledTimeout(timeout)).Should(Exit(0))
+			var RMQSkipSSLValue string = "0"
+			if config.RabbitMQSkipSSL {
+				RMQSkipSSLValue = "1"
+			}
+			Eventually(cf.Cf("set-env", appName, "RABBITMQ_SKIP_SSL", RMQSkipSSLValue), config.ScaledTimeout(5*time.Minute)).Should(Exit(0))
 			Eventually(cf.Cf("start", appName), config.ScaledTimeout(5*time.Minute)).Should(Exit(0))
 			assertAppIsRunning(appName)
 
 			/*
-			    create a queue     (should 201)
-			    list the queues    (should 200)
-			    subscribe          (should 204)
-			    publish            (should 201)
-			    subscribe          (should 200)
-			 */
+			   create a queue     (should 201)
+			   list the queues    (should 200)
+			   subscribe          (should 204)
+			   publish            (should 201)
+			   subscribe          (should 200)
+			*/
 			uri := appUri(appName) + "/queues"
 			fmt.Println("Creating a new queue: ", uri)
 			Eventually(runner.Curl(uri, "-k", "-X", "POST", "-d", "name=test-q"), config.ScaledTimeout(timeout), retryInterval).Should(Say("SUCCESS"))
