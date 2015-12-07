@@ -1,12 +1,13 @@
 {
-  "service_name": "rabbitmq",
+  "service_name": "p-rabbitmq",
   "plan_names": [
     "standard"
   ],
-  "apps_domain": "10.244.0.34.xip.io", 
-  "api": "api.10.244.0.34.xip.io",
+  "apps_domain": "bosh-lite.com", 
+  "api": "https://api.bosh-lite.com",
   "admin_user": "admin",
   "admin_password": "admin",
   "create_permissive_security_group": true,
-  "skip_ssl_validation": true
+  "skip_ssl_validation": true,
+  "rabbitmq_skip_ssl": true
 }
