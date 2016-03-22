@@ -43,6 +43,7 @@ func loadConfig() (testConfig rabbitmqTestConfig) {
 }
 
 var config = loadConfig()
+var context services.Context
 
 var _ = Describe("RabbitMQ Service", func() {
 	var timeout = time.Second * 60
@@ -68,7 +69,12 @@ var _ = Describe("RabbitMQ Service", func() {
 
 	BeforeSuite(func() {
 		config.TimeoutScale = 3
-		services.NewContext(config.Config, "rabbitmq-smoke-test").Setup()
+		context = services.NewContext(config.Config, "rabbitmq-smoke-test")
+		context.Setup()
+	})
+
+	AfterSuite(func() {
+		context.Teardown()
 	})
 
 	AssertLifeCycleBehavior := func(planName string) {
