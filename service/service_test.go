@@ -81,15 +81,15 @@ var _ = Describe("RabbitMQ Service", func() {
 		context.Teardown()
 	})
 
-	AssertLifeCycleAMQPBehavior := func(planName, planPath string) {
+	AssertLifeCycleAMQPBehavior := func(planName, appPath string) {
 		var serviceInstanceName string
 		appPushed := false
 		serviceCreated := false
 		serviceBound := false
 		appIsRunning := false
+		appName = randomName()
 
 		It("Should be able to push the application", func() {
-			appName = randomName()
 			Eventually(cf.Cf("push", appName, "-m", "256M", "-p", appPath, "-s", "cflinuxfs2", "-no-start"), config.ScaledTimeout(timeout)).Should(Exit(0))
 			appPushed = true
 		})
@@ -160,7 +160,7 @@ var _ = Describe("RabbitMQ Service", func() {
 		})
 	}
 
-	AssertLifeCycleMQTTBehavior := func(planName, planPath string) {
+	AssertLifeCycleMQTTBehavior := func(planName, appPath string) {
 		var serviceInstanceName string
 		appPushed := false
 		serviceCreated := false
@@ -202,7 +202,7 @@ var _ = Describe("RabbitMQ Service", func() {
 			   subscribe          (should 200)
 			*/
 
-			uri = appUri(appName) + "/queue/test-q"
+			uri := appUri(appName) + "/queue/test-q"
 			fmt.Println("Reading from the (empty) queue: ", uri)
 			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say(""))
 			fmt.Println("\n")
@@ -229,7 +229,7 @@ var _ = Describe("RabbitMQ Service", func() {
 		})
 	}
 
-	AssertLifeCycleSTOMPBehavior := func(planName, planPath string) {
+	AssertLifeCycleSTOMPBehavior := func(planName, appPath string) {
 		var serviceInstanceName string
 		appPushed := false
 		serviceCreated := false
@@ -270,7 +270,7 @@ var _ = Describe("RabbitMQ Service", func() {
 			   publish            (should 201)
 			   subscribe          (should 200)
 			*/
-			uri = appUri(appName) + "/queue/test-q"
+			uri := appUri(appName) + "/queue/test-q"
 			fmt.Println("Reading from the (empty) queue: ", uri)
 			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say(""))
 			fmt.Println("\n")
@@ -299,9 +299,9 @@ var _ = Describe("RabbitMQ Service", func() {
 
 	Context("for each plan", func() {
 		for _, planName := range config.PlanNames {
-			AssertLifeCycleAMQPBehavior(planName, planAMQPPath)
-			AssertLifeCycleMQTTBehavior(planName, planMQTTPath)
-			AssertLifeCycleSTOMPBehavior(planName, PlanSTOMPPath)
+			AssertLifeCycleAMQPBehavior(planName, appAMQPPath)
+			AssertLifeCycleMQTTBehavior(planName, appMQTTPath)
+			AssertLifeCycleSTOMPBehavior(planName, appSTOMPPath)
 		}
 	})
 })
