@@ -167,20 +167,20 @@ var _ = Describe("RabbitMQ Service", func() {
 		serviceBound := false
 		appIsRunning := false
 
-		It("Should be able to push the application", func() {
+		It("MQTT Protocol - Should be able to push the application", func() {
 			appName = randomName()
 			Eventually(cf.Cf("push", appName, "-m", "256M", "-p", appPath, "-s", "cflinuxfs2", "-no-start"), config.ScaledTimeout(timeout)).Should(Exit(0))
 			appPushed = true
 		})
 
-		It("Can create the service instance", func() {
+		It("MQTT Protocol - Can create the service instance", func() {
 			Ω(appPushed).Should(BeTrue())
 			serviceInstanceName = randomName()
 			Eventually(cf.Cf("create-service", config.ServiceName, planName, serviceInstanceName), config.ScaledTimeout(timeout)).Should(Exit(0))
 			serviceCreated = true
 		})
 
-		It("Can bind the service and start the application", func() {
+		It("MQTT Protocol - Can bind the service and start the application", func() {
 			Ω(appPushed && serviceCreated).Should(BeTrue())
 			Eventually(cf.Cf("bind-service", appName, serviceInstanceName), config.ScaledTimeout(timeout)).Should(Exit(0))
 			serviceBound = true
@@ -194,7 +194,7 @@ var _ = Describe("RabbitMQ Service", func() {
 			appIsRunning = true
 		})
 
-		It("can write to and read from a service instance using the "+planName+" plan", func() {
+		It("MQTT Protocol - can write to and read from a service instance using the "+planName+" plan", func() {
 			Ω(appPushed && serviceCreated && serviceBound && appIsRunning).Should(BeTrue())
 			/*
 			   subscribe          (should 204)
@@ -216,7 +216,7 @@ var _ = Describe("RabbitMQ Service", func() {
 			fmt.Println("\n")
 		})
 
-		It("Should be able to clean up after itself", func() {
+		It("MQTT Protocol - Should be able to clean up after itself", func() {
 			if serviceBound {
 				Eventually(cf.Cf("unbind-service", appName, serviceInstanceName), config.ScaledTimeout(timeout)).Should(Exit(0))
 			}
@@ -236,20 +236,20 @@ var _ = Describe("RabbitMQ Service", func() {
 		serviceBound := false
 		appIsRunning := false
 
-		It("Should be able to push the application", func() {
+		It("STOMP Protocol - Should be able to push the application", func() {
 			appName = randomName()
 			Eventually(cf.Cf("push", appName, "-m", "256M", "-p", appPath, "-s", "cflinuxfs2", "-no-start"), config.ScaledTimeout(timeout)).Should(Exit(0))
 			appPushed = true
 		})
 
-		It("Can create the service instance", func() {
+		It("STOMP Protocol - Can create the service instance", func() {
 			Ω(appPushed).Should(BeTrue())
 			serviceInstanceName = randomName()
 			Eventually(cf.Cf("create-service", config.ServiceName, planName, serviceInstanceName), config.ScaledTimeout(timeout)).Should(Exit(0))
 			serviceCreated = true
 		})
 
-		It("Can bind the service and start the application", func() {
+		It("STOMP Protocol - Can bind the service and start the application", func() {
 			Ω(appPushed && serviceCreated).Should(BeTrue())
 			Eventually(cf.Cf("bind-service", appName, serviceInstanceName), config.ScaledTimeout(timeout)).Should(Exit(0))
 			serviceBound = true
@@ -263,7 +263,7 @@ var _ = Describe("RabbitMQ Service", func() {
 			appIsRunning = true
 		})
 
-		It("can write to and read from a service instance using the "+planName+" plan", func() {
+		It("STOMP Protocol - can write to and read from a service instance using the "+planName+" plan", func() {
 			Ω(appPushed && serviceCreated && serviceBound && appIsRunning).Should(BeTrue())
 			/*
 			   subscribe          (should 204)
@@ -284,7 +284,7 @@ var _ = Describe("RabbitMQ Service", func() {
 			fmt.Println("\n")
 		})
 
-		It("Should be able to clean up after itself", func() {
+		It("STOMP Protocol - Should be able to clean up after itself", func() {
 			if serviceBound {
 				Eventually(cf.Cf("unbind-service", appName, serviceInstanceName), config.ScaledTimeout(timeout)).Should(Exit(0))
 			}
