@@ -47,8 +47,8 @@ var context services.Context
 
 var _ = Describe("RabbitMQ Service", func() {
 	var (
-		timeout       = time.Second * 60
-		retryInterval = time.Second * 1
+		timeout       = time.Second * 25
+		retryInterval = time.Second * 4
 		appAMQPPath   = "../assets/cf-rabbitmq-example-app"
 		appMQTTPath   = "../assets/cf-rabbitmq-example-mqtt-app"
 		appSTOMPPath  = "../assets/cf-rabbitmq-example-stomp-app"
@@ -70,7 +70,7 @@ var _ = Describe("RabbitMQ Service", func() {
 	}
 
 	BeforeSuite(func() {
-		config.TimeoutScale = 3
+		config.TimeoutScale = 30
 		context = services.NewContext(config.Config, "rabbitmq-smoke-test")
 		context.Setup()
 	})
@@ -122,16 +122,17 @@ var _ = Describe("RabbitMQ Service", func() {
 			*/
 
 			uri := appUri(appName) + "/queue/test-q"
-			fmt.Println("Reading from the (empty) queue: ", uri)
-			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say(""))
-			fmt.Println("\n")
 
 			fmt.Println("Publishing to the queue: ", uri)
-			Eventually(runner.Curl("-d", "data=test-message", "-X", "PUT", uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("SUCCESS"))
+			Eventually(runner.Curl("-d", "data=test-message-mqtt", "-X", "PUT", uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("SUCCESS"))
 			fmt.Println("\n")
 
 			fmt.Println("Reading from the (non-empty) queue: ", uri)
-			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("test-message"))
+			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("test-message-mqtt"))
+			fmt.Println("\n")
+
+			fmt.Println("Reading from the (empty) queue: ", uri)
+			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say(""))
 			fmt.Println("\n")
 		})
 
@@ -190,16 +191,17 @@ var _ = Describe("RabbitMQ Service", func() {
 			   subscribe          (should 200)
 			*/
 			uri := appUri(appName) + "/queue/test-q"
-			fmt.Println("Reading from the (empty) queue: ", uri)
-			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say(""))
-			fmt.Println("\n")
 
 			fmt.Println("Publishing to the queue: ", uri)
-			Eventually(runner.Curl("-d", "data=test-message", "-X", "PUT", uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("SUCCESS"))
+			Eventually(runner.Curl("-d", "data=test-message-stomp", "-X", "PUT", uri, "-k", "-vv"), config.ScaledTimeout(timeout), retryInterval).Should(Say("SUCCESS"))
 			fmt.Println("\n")
 
 			fmt.Println("Reading from the (non-empty) queue: ", uri)
-			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("test-message"))
+			Eventually(runner.Curl(uri, "-k", "-vv"), config.ScaledTimeout(timeout), retryInterval).Should(Say("test-message-stomp"))
+			fmt.Println("\n")
+
+			fmt.Println("Reading from the (empty) queue: ", uri)
+			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say(""))
 			fmt.Println("\n")
 		})
 
@@ -269,16 +271,17 @@ var _ = Describe("RabbitMQ Service", func() {
 			fmt.Println("\n")
 
 			uri = appUri(appName) + "/queue/test-q"
-			fmt.Println("Reading from the (empty) queue: ", uri)
-			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say(""))
-			fmt.Println("\n")
 
 			fmt.Println("Publishing to the queue: ", uri)
-			Eventually(runner.Curl("-d", "data=test-message", "-X", "PUT", uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("SUCCESS"))
+			Eventually(runner.Curl("-d", "data=test-message-amqp", "-X", "PUT", uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("SUCCESS"))
 			fmt.Println("\n")
 
 			fmt.Println("Reading from the (non-empty) queue: ", uri)
-			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("test-message"))
+			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say("test-message-amqp"))
+			fmt.Println("\n")
+
+			fmt.Println("Reading from the (empty) queue: ", uri)
+			Eventually(runner.Curl(uri, "-k"), config.ScaledTimeout(timeout), retryInterval).Should(Say(""))
 			fmt.Println("\n")
 		})
 
