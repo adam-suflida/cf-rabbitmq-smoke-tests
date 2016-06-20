@@ -1,3 +1,9 @@
 [submodule "assets/cf-rabbitmq-example-app"]
 	path = assets/cf-rabbitmq-example-app
 	url = git@github.com:cloudfoundry-community/cf-rabbitmq-example-app
+[submodule "assets/cf-rabbitmq-example-mqtt-app"]
+	path = assets/cf-rabbitmq-example-mqtt-app
+	url = git@github.com:cloudfoundry-community/cf-rabbitmq-example-mqtt-app.git
+[submodule "assets/cf-rabbitmq-example-stomp-app"]
+	path = assets/cf-rabbitmq-example-stomp-app
+	url = git@github.com:cloudfoundry-community/cf-rabbitmq-example-stomp-app.git

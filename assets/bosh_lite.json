@@ -9,5 +9,7 @@
   "admin_password": "admin",
   "create_permissive_security_group": true,
   "skip_ssl_validation": true,
-  "rabbitmq_skip_ssl": true
+  "rabbitmq_skip_ssl": true,
+  "test_stomp": false,
+  "test_mqtt": false
 }
