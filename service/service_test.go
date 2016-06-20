@@ -24,6 +24,8 @@ type rabbitmqTestConfig struct {
 	ServiceName     string   `json:"service_name"`
 	PlanNames       []string `json:"plan_names"`
 	RabbitMQSkipSSL bool     `json:"rabbitmq_skip_ssl"`
+  TestSTOMP       bool     `json:"test_stomp"`
+  TestMQTT        bool     `json:"test_mqtt"`
 }
 
 func loadConfig() (testConfig rabbitmqTestConfig) {
@@ -301,8 +303,12 @@ var _ = Describe("RabbitMQ Service", func() {
 	Context("for each plan", func() {
 		for _, planName := range config.PlanNames {
 			AssertLifeCycleAMQPBehavior(planName, appAMQPPath)
-			AssertLifeCycleSTOMPBehavior(planName, appSTOMPPath)
-			AssertLifeCycleMQTTBehavior(planName, appMQTTPath)
+      if config.TestSTOMP {
+			  AssertLifeCycleSTOMPBehavior(planName, appSTOMPPath)
+      }
+      if config.TestMQTT {
+			  AssertLifeCycleMQTTBehavior(planName, appMQTTPath)
+      }
 		}
 	})
 })
